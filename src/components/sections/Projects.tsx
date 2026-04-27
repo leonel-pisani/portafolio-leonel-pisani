@@ -160,7 +160,7 @@ const ProjectCard = ({
 
 /* ── Main section ──────────────────────── */
 const Projects = () => {
-  const { repos, loading, error } = useGithubRepos('leonel-pisani')
+  const { repos } = useGithubRepos('leonel-pisani')
 
   return (
     <section
