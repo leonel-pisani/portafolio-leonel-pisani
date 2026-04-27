@@ -60,7 +60,7 @@ const COURSES: Course[] = [
     year:        '2025',
     badge:       '🤖',
     color:       '#a855f7',
-    image:       '/src/assets/ia.png',   // ← reemplazá con '/certificates/ia.jpg'
+    image:       '/ia.png',   // ← reemplazá con '/certificates/ia.jpg'
     link:        'https://www.linkedin.com/feed/update/urn:li:activity:7391474468298129408/',
     tags:        ['Inteligencia Artificial', 'Machine Learning'],
   },
