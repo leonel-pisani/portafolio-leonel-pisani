@@ -30,7 +30,7 @@ const COURSES: Course[] = [
     year:        'Cursando el proyecto final integrador',
     badge:       '🎓',
     color:       'green',
-    image:       '/universidad.png',   // ← reemplazá con '/certificates/python.jpg'
+    image:       `${import.meta.env.BASE_URL}universidad.png`,   // ← reemplazá con '/certificates/python.jpg'
     link:        '',
     tags:        ['Universidad'],
   },
@@ -40,7 +40,7 @@ const COURSES: Course[] = [
     year:        '2025',
     badge:       '🐍',
     color:       '#3b82f6',
-    image:       '/python.png',   // ← reemplazá con '/certificates/python.jpg'
+    image:       `${import.meta.env.BASE_URL}python.png`,   // ← reemplazá con '/certificates/python.jpg'
     link:        'https://www.linkedin.com/feed/update/urn:li:activity:7389424724558180352/',
     tags:        ['Python', 'Programación', 'Universidad'],
   },
@@ -50,7 +50,7 @@ const COURSES: Course[] = [
     year:        '2025',
     badge:       '☕',
     color:       '#f59e0b',
-    image:       '/java.png',   // ← reemplazá con '/certificates/java.jpg'
+    image:       `${import.meta.env.BASE_URL}java.png`,   // ← reemplazá con '/certificates/java.jpg'
     link:        'https://www.linkedin.com/feed/update/urn:li:activity:7407502423205908481/',
     tags:        ['Java', 'Spring Boot', 'Backend'],
   },
@@ -60,7 +60,7 @@ const COURSES: Course[] = [
     year:        '2025',
     badge:       '🤖',
     color:       '#a855f7',
-    image:       '/ia.png',   // ← reemplazá con '/certificates/ia.jpg'
+    image:       `${import.meta.env.BASE_URL}IA.png`,   // ← reemplazá con '/certificates/ia.jpg'
     link:        'https://www.linkedin.com/feed/update/urn:li:activity:7391474468298129408/',
     tags:        ['Inteligencia Artificial', 'Machine Learning'],
   },
