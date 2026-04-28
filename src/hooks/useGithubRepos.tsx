@@ -22,6 +22,7 @@ interface HookState {
 const REPO_NAMES = [
   'back-UNAHUR-anti-social',
   'front-UNAHUR-anti-social',
+  'ciu-tp1-grupo2',
 ]
 
 /* ── Hook ──────────────────────────────── */
