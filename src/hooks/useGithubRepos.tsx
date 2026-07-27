@@ -16,10 +16,13 @@ interface HookState {
 }
 
 /* ──────────────────────────────────────────
-   Agrega o quitá repos de esta lista para
-   controlar cuáles se muestran en el portfolio.
+   Agrega o quitá repos de esta lista.
+   - Si es tuyo: solo poné el nombre (ej: 'mi-repo')
+   - Si es de una org/otro: poné 'dueño/repo'
 ────────────────────────────────────────── */
-const REPO_NAMES = [
+const REPOS_TO_FETCH = [
+  'DesApp-2026c1-Grupo-2/Backend',  // Proyecto grupal Backend
+  'DesApp-2026c1-Grupo-2/Frontend', // Proyecto grupal Frontend
   'back-UNAHUR-anti-social',
   'front-UNAHUR-anti-social',
   'ciu-tp1-grupo2',
@@ -39,14 +42,20 @@ export const useGithubRepos = (username: string): HookState => {
     const fetchRepos = async () => {
       try {
         const results = await Promise.all(
-          REPO_NAMES.map(async repoName => {
+          REPOS_TO_FETCH.map(async repoPath => {
+            
+            // Lógica clave: determinar quién es el dueño de este repo en particular
+            const [owner, name] = repoPath.includes('/')
+              ? repoPath.split('/')
+              : [username, repoPath]
+
             const [repoRes, langRes] = await Promise.all([
-              fetch(`https://api.github.com/repos/${username}/${repoName}`),
-              fetch(`https://api.github.com/repos/${username}/${repoName}/languages`),
+              fetch(`https://api.github.com/repos/${owner}/${name}`),
+              fetch(`https://api.github.com/repos/${owner}/${name}/languages`),
             ])
 
             if (!repoRes.ok) {
-              throw new Error(`Repo "${repoName}" no encontrado (${repoRes.status})`)
+              throw new Error(`Repo "${name}" no encontrado (${repoRes.status})`)
             }
 
             const [repoData, langData] = await Promise.all([
