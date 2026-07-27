@@ -40,51 +40,63 @@ export const useGithubRepos = (username: string): HookState => {
     let cancelled = false
 
     const fetchRepos = async () => {
-      try {
-        const results = await Promise.all(
-          REPOS_TO_FETCH.map(async repoPath => {
-            
-            // Lógica clave: determinar quién es el dueño de este repo en particular
-            const [owner, name] = repoPath.includes('/')
-              ? repoPath.split('/')
-              : [username, repoPath]
+      // Promise.allSettled en vez de Promise.all: si un repo falla
+      // (rate limit, nombre mal escrito, repo movido, etc.) no tira
+      // abajo a los demás, simplemente se omite ese.
+      const settled = await Promise.allSettled(
+        REPOS_TO_FETCH.map(async repoPath => {
 
-            const [repoRes, langRes] = await Promise.all([
-              fetch(`https://api.github.com/repos/${owner}/${name}`),
-              fetch(`https://api.github.com/repos/${owner}/${name}/languages`),
-            ])
+          // Lógica clave: determinar quién es el dueño de este repo en particular
+          const [owner, name] = repoPath.includes('/')
+            ? repoPath.split('/')
+            : [username, repoPath]
 
-            if (!repoRes.ok) {
-              throw new Error(`Repo "${name}" no encontrado (${repoRes.status})`)
-            }
+          const [repoRes, langRes] = await Promise.all([
+            fetch(`https://api.github.com/repos/${owner}/${name}`),
+            fetch(`https://api.github.com/repos/${owner}/${name}/languages`),
+          ])
 
-            const [repoData, langData] = await Promise.all([
-              repoRes.json(),
-              langRes.json(),
-            ])
+          if (!repoRes.ok) {
+            throw new Error(`Repo "${repoPath}" no encontrado (${repoRes.status})`)
+          }
 
-            return {
-              id:          repoData.id as number,
-              name:        repoData.name as string,
-              description: (repoData.description as string) ?? '',
-              html_url:    repoData.html_url as string,
-              languages:   Object.keys(langData as Record<string, number>),
-            } satisfies Repo
-          })
-        )
+          const [repoData, langData] = await Promise.all([
+            repoRes.json(),
+            langRes.json(),
+          ])
 
-        if (!cancelled) {
-          setState({ repos: results, loading: false, error: null })
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setState({
-            repos:   [],
-            loading: false,
-            error:   err instanceof Error ? err.message : 'Error desconocido',
-          })
-        }
-      }
+          return {
+            id:          repoData.id as number,
+            name:        repoData.name as string,
+            description: (repoData.description as string) ?? '',
+            html_url:    repoData.html_url as string,
+            languages:   Object.keys(langData as Record<string, number>),
+          } satisfies Repo
+        })
+      )
+
+      if (cancelled) return
+
+      const repos = settled
+        .filter((r): r is PromiseFulfilledResult<Repo> => r.status === 'fulfilled')
+        .map(r => r.value)
+
+      const failed = settled.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected'
+      )
+
+      // Log de los que fallaron para poder diagnosticarlos sin romper la sección entera
+      failed.forEach(f => console.warn('[useGithubRepos]', f.reason))
+
+      setState({
+        repos,
+        loading: false,
+        // Si TODOS fallaron, mostramos error. Si solo algunos, mostramos
+        // los que sí se pudieron cargar y logueamos el resto en consola.
+        error: repos.length === 0 && failed.length > 0
+          ? (failed[0].reason instanceof Error ? failed[0].reason.message : 'Error desconocido')
+          : null,
+      })
     }
 
     fetchRepos()

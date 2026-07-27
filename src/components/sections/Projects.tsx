@@ -160,7 +160,7 @@ const ProjectCard = ({
 
 /* ── Main section ──────────────────────── */
 const Projects = () => {
-  const { repos } = useGithubRepos('leonel-pisani')
+  const { repos, loading, error } = useGithubRepos('leonel-pisani')
 
   return (
     <section
@@ -185,6 +185,20 @@ const Projects = () => {
         Repositorios públicos en GitHub. Código real, problemas reales.
       </p>
 
+      {error && (
+        <p
+          style={{
+            fontSize:     '13px',
+            color:        '#f87171',
+            marginBottom: '20px',
+            fontFamily:   'var(--mono)',
+          }}
+        >
+          No se pudieron cargar los proyectos ({error}). Puede ser un límite temporal
+          de la API de GitHub — probá recargar en un rato.
+        </p>
+      )}
+
       <div
         style={{
           display:             'grid',
@@ -192,7 +206,7 @@ const Projects = () => {
           gap:                 '14px',
         }}
       >
-        {repos.length === 0
+        {loading
           ? /* Loading skeletons */
             [0, 1].map(i => (
               <div
